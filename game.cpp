@@ -1,37 +1,96 @@
 #include "game.hpp"
 
-Game::Game() { 
-loadFiles();
-}
 
-void Game::loadFiles() { 
-
-if (!map1.loadFromFile("resources/background_01.png")) {
-    std::cout << "Error with image location";
-}
-map2.loadFromFile("resources/background_02.png");
-map3.loadFromFile("resources/background_03.png");
-map4.loadFromFile("resources/background_04.png");
-map5.loadFromFile("resources/background_05.png");
-
-L_Attack.loadFromFile("resources/L/L_Attack1.png");
-L_Attack2.loadFromFile("resources/L/L_Attack2.png");
-L_Dead.loadFromFile("resources/L/L_dead.png");
-L_Idle.loadFromFile("resources/L/L_Idle.png");
-L_Run.loadFromFile("resources/L/L_Run.png");
-
-R_Attack.loadFromFile("resources/R/R_Attack1.png");
-R_Attack2.loadFromFile("resources/R/R_Attack2.png");
-R_Dead.loadFromFile("resources/R/R_Dead.png");
-R_Idle.loadFromFile("resources/R/R_Idle.png");
-R_Run.loadFromFile("resources/R/R_Run.png");
-
+Game::Game() {
+    loadFiles();
+    player = new Player();
+    bot = new Player();
 
 }
 
-void Game::draw(sf::RenderTarget &window, sf::RenderStates states) const {
+void Game::update() {
+    timer = clock.getElapsedTime().asSeconds();
+    switch (input) {
+        case Left:
+            player->animate("Run", clock);
+            if (player->getCompleted() == true) {
+                input = Idle;
+            }
+            break;
+        case Right:
+            player->animate("Run", clock);
+            if (player->getCompleted() == true) {
+                //std::cout << "RUN" << std::endl;
+                input = Idle;
+            }
+            break;
+        case Attack:
+            player->animate("Attack", clock);
+            if (player->getCompleted() == true) {
+                //std::cout << "PUNCH" << std::endl;
+                input = Idle;
+            }
+            break;
+        case Attack2:
+            player->animate("Attack2", clock);
+            if (player->getCompleted() == true) {
+                //std::cout << "PUNCH" << std::endl;
+                input = Idle;
+            }
+            break;
+        case Idle:
+            //std::cout << "Idle" << std::endl;
+            player->animate("Idle", clock);
+            player->setCompleted();
+            break;
 
-    sf::Sprite background(map1);
-    window.draw(background,states);
+        default:
+            //std::cout << "Default" << std::endl;
+            player->animate("Idle", clock);
+            break;
+    }
+}
 
+float Game::getTime() {
+    return clock.getElapsedTime().asSeconds();
+}
+
+Game::~Game() {
+    delete player; 
+}
+
+void Game::loadFiles() {
+    if (!map.loadFromFile("resources/background.png")) {
+        std::cout << "Error loading background texture!" << std::endl;
+    }
+    background.setTexture(map);
+}
+
+void Game::movePlayer(Controls control) {
+    switch (control) {
+        case Left:
+            input = Left;
+            player->setFlipped(true);
+            player->getSprite().move(-10, 0);
+            break;
+        case Right:
+            input = Right;
+            player->setFlipped(false);
+            player->getSprite().move(10, 0);
+            break;
+        case Attack:
+            input = Attack;
+            break;
+        case Attack2:
+            input = Attack2;
+            break;
+        default:
+            input = Idle;
+            break;
+    }
+}
+
+void Game::draw(sf::RenderTarget& window, sf::RenderStates states) const {
+    window.draw(background, states);
+    window.draw(player->getSprite(), states);
 }

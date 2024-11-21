@@ -1,20 +1,38 @@
 #include "game.hpp"
+#include "player.hpp"
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(1280, 720), "PVP");
-    Game test;
+    sf::RenderWindow window(sf::VideoMode(800, 600), "PVP");
+
+    Game game;
+
     while (window.isOpen()) {
         sf::Event event;
-        
-        // Event polling loop
         while (window.pollEvent(event)) {
             if (event.type == sf::Event::Closed) {
-                window.close();  // Close the window on 'close' event
-            }
+                window.close();
+            } else if (event.type == sf::Event::KeyPressed) {
+                    switch (event.key.code) {
+                        case sf::Keyboard::Left:
+                            game.movePlayer(Left);
+                            break;
+                        case sf::Keyboard::Right:
+                            game.movePlayer(Right);
+                            break;
+                        case sf::Keyboard::E:
+                            game.movePlayer(Attack);
+                            break;
+                        case sf::Keyboard::Q:
+                            game.movePlayer(Attack2);
+                            break;
+                        default: break;
+                    }
+                }
         }
-
-        window.clear();  
-        window.draw(test);  
-        window.display();  
+        window.clear();
+        game.update(); 
+        window.draw(game);
+        window.display();
+        
     }
 }

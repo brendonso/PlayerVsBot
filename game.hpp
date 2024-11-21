@@ -1,35 +1,40 @@
+#pragma once
+#include "player.hpp"
 #include <SFML/Graphics.hpp>
-#include <iostream>
+#include <string>
+#include <unordered_map>
 
-class Game  : public sf::Drawable{
-    public:
+class Player;
+
+enum Controls {
+    Left = 1,
+    Right = 2,
+    Attack = 3,
+    Attack2 = 4,
+    Idle = 5,
+    Dead = 6
+};
+
+class Game : public sf::Drawable {
+public:
     Game();
+    ~Game();
     void loadFiles();
+    void movePlayer(Controls controls);
+    void selectMap(int num);
+    void update();
+    float getTime();
 
-    protected:
-    void draw(sf::RenderTarget& window, sf::RenderStates states) const override ;
-    private:
-    sf::Sprite bacgkround;
+protected:
+    void draw(sf::RenderTarget& window, sf::RenderStates states) const override;
 
-    sf::Texture map1;
-    sf::Texture map2;
-    sf::Texture map3;
-    sf::Texture map4;
-    sf::Texture map5;
-
-    sf::Sprite playerL;
-
-    sf::Texture L_Attack;
-    sf::Texture L_Attack2;
-    sf::Texture L_Dead;
-    sf::Texture L_Idle;
-    sf::Texture L_Run;
-
-    sf::Sprite playerR;
-
-    sf::Texture R_Attack;
-    sf::Texture R_Attack2;
-    sf::Texture R_Dead;
-    sf::Texture R_Idle;
-    sf::Texture R_Run;
+private:
+    Player* player; 
+    Player* bot; 
+    sf::Clock clock;
+    bool Start = false;
+    sf::Texture map;
+    sf::Sprite background;
+    Controls input;
+    float timer;
 };
