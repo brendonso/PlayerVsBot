@@ -2,7 +2,7 @@
 #include "player.hpp"
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "PVP");
+    sf::RenderWindow window(sf::VideoMode(900, 600), "PVP");
 
     Game game;
 
@@ -14,16 +14,19 @@ int main() {
             } else if (event.type == sf::Event::KeyPressed) {
                     switch (event.key.code) {
                         case sf::Keyboard::Left:
-                            game.movePlayer(Left);
+                            game.setInput(Left);
                             break;
                         case sf::Keyboard::Right:
-                            game.movePlayer(Right);
+                            game.setInput(Right);
                             break;
                         case sf::Keyboard::E:
-                            game.movePlayer(Attack);
+                            game.setInput(Attack);
                             break;
                         case sf::Keyboard::Q:
-                            game.movePlayer(Attack2);
+                            game.setInput(Attack2);
+                            break;
+                        case sf::Keyboard::Space:
+                            game.setInput(Jump);
                             break;
                         default: break;
                     }

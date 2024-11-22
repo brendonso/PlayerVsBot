@@ -12,7 +12,8 @@ enum Controls {
     Attack = 3,
     Attack2 = 4,
     Idle = 5,
-    Dead = 6
+    Dead = 6,
+    Jump = 7
 };
 
 class Game : public sf::Drawable {
@@ -20,10 +21,14 @@ public:
     Game();
     ~Game();
     void loadFiles();
-    void movePlayer(Controls controls);
+    void setInput(Controls controls);
     void selectMap(int num);
     void update();
+    void updatePlayer(bool runLeft, bool runRight) ;
     float getTime();
+
+    void setupHealth();
+    void setupStam();
 
 protected:
     void draw(sf::RenderTarget& window, sf::RenderStates states) const override;
@@ -33,8 +38,15 @@ private:
     Player* bot; 
     sf::Clock clock;
     bool Start = false;
+    bool jumping = false;
+    sf::RectangleShape healthBar;
+    sf::RectangleShape stamBar;
+
     sf::Texture map;
     sf::Sprite background;
     Controls input;
+    Controls storedInput;
+    bool runLeft;
+    bool runRight;
     float timer;
 };

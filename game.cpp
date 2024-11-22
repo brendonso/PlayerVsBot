@@ -1,54 +1,18 @@
 #include "game.hpp"
 
-
 Game::Game() {
     loadFiles();
     player = new Player();
     bot = new Player();
-
+    //scoreboard
 }
 
 void Game::update() {
     timer = clock.getElapsedTime().asSeconds();
-    switch (input) {
-        case Left:
-            player->animate("Run", clock);
-            if (player->getCompleted() == true) {
-                input = Idle;
-            }
-            break;
-        case Right:
-            player->animate("Run", clock);
-            if (player->getCompleted() == true) {
-                //std::cout << "RUN" << std::endl;
-                input = Idle;
-            }
-            break;
-        case Attack:
-            player->animate("Attack", clock);
-            if (player->getCompleted() == true) {
-                //std::cout << "PUNCH" << std::endl;
-                input = Idle;
-            }
-            break;
-        case Attack2:
-            player->animate("Attack2", clock);
-            if (player->getCompleted() == true) {
-                //std::cout << "PUNCH" << std::endl;
-                input = Idle;
-            }
-            break;
-        case Idle:
-            //std::cout << "Idle" << std::endl;
-            player->animate("Idle", clock);
-            player->setCompleted();
-            break;
-
-        default:
-            //std::cout << "Default" << std::endl;
-            player->animate("Idle", clock);
-            break;
-    }
+    runLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
+    runRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+    updatePlayer(runLeft,runRight);
+    //need collisions 
 }
 
 float Game::getTime() {
@@ -66,17 +30,17 @@ void Game::loadFiles() {
     background.setTexture(map);
 }
 
-void Game::movePlayer(Controls control) {
+void Game::setInput(Controls control) {
     switch (control) {
         case Left:
             input = Left;
+            storedInput = Left;
             player->setFlipped(true);
-            player->getSprite().move(-10, 0);
             break;
         case Right:
             input = Right;
+            storedInput = Right;
             player->setFlipped(false);
-            player->getSprite().move(10, 0);
             break;
         case Attack:
             input = Attack;
@@ -84,13 +48,71 @@ void Game::movePlayer(Controls control) {
         case Attack2:
             input = Attack2;
             break;
+        case Jump:
+            input = Jump;
+            break;
         default:
             input = Idle;
+            break;
+    }
+}
+void Game::updatePlayer(bool runLeft, bool runRight) {
+    player->setHitbox();
+    switch (input) {
+        case Left:
+            player->getSprite().move(-1, 0);
+            player->animate("Run", clock);
+            if (player->getCompleted() == true && !runLeft) {
+                input = Idle;
+            }
+            break;
+        case Right:
+            player->getSprite().move(1, 0);
+            player->animate("Run", clock);
+            if (player->getCompleted() == true && !runRight) {
+                input = Idle;
+            }
+            break;
+        case Attack:
+            if(runRight) {
+               player->getSprite().move(.25, 0); 
+            } else if(runLeft) {
+                player->getSprite().move(-.25, 0); 
+            }
+            player->animate("Attack", clock);
+            if (player->getCompleted() == true) {
+                input = Idle;
+            }
+            break;
+        case Attack2:
+            if(runRight) {
+               player->getSprite().move(.25, 0); 
+            } else if(runLeft) {
+                player->getSprite().move(-.25, 0); 
+            }
+            player->animate("Attack2", clock);
+            if (player->getCompleted() == true) {
+                input = Idle;
+            }
+            break;
+        case Idle:
+            if(runLeft || runRight) {
+            input = storedInput;
+            break;
+            }
+            player->animate("Idle", clock);
+            player->setCompleted();
+            break;
+        case Jump:
+            player->setJump(runLeft || runRight);
+            input = storedInput;
+            break;
+        default:
             break;
     }
 }
 
 void Game::draw(sf::RenderTarget& window, sf::RenderStates states) const {
     window.draw(background, states);
-    window.draw(player->getSprite(), states);
+    window.draw(*player,states);
 }
