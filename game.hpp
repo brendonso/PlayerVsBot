@@ -1,11 +1,12 @@
 #pragma once
 #include "player.hpp"
+#include "bot.hpp"
 #include <SFML/Graphics.hpp>
 #include <string>
 #include <unordered_map>
-
+#include "stats.hpp"
 class Player;
-
+class Bot;
 enum Controls {
     Left = 1,
     Right = 2,
@@ -27,20 +28,21 @@ public:
     void updatePlayer(bool runLeft, bool runRight) ;
     float getTime();
 
-    void setupHealth();
-    void setupStam();
+    void setupStats();
 
 protected:
     void draw(sf::RenderTarget& window, sf::RenderStates states) const override;
 
 private:
-    Player* player; 
+    Bot* player; 
     Player* bot; 
-    sf::Clock clock;
+    Stats* stats; 
+    sf::Clock L_clock;
+    sf::Clock R_clock;
+    sf::Clock statClock;
     bool Start = false;
     bool jumping = false;
-    sf::RectangleShape healthBar;
-    sf::RectangleShape stamBar;
+
 
     sf::Texture map;
     sf::Sprite background;

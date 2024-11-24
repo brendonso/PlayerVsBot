@@ -2,21 +2,24 @@
 
 Game::Game() {
     loadFiles();
-    player = new Player();
-    bot = new Player();
-    //scoreboard
+    player = new Bot();
+    bot = new Player(50);
+    stats = new Stats();
 }
 
 void Game::update() {
-    timer = clock.getElapsedTime().asSeconds();
+    timer = L_clock.getElapsedTime().asSeconds();
     runLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
     runRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
     updatePlayer(runLeft,runRight);
-    //need collisions 
+    stats->updateClock();
+
+
 }
 
+
 float Game::getTime() {
-    return clock.getElapsedTime().asSeconds();
+    return L_clock.getElapsedTime().asSeconds();
 }
 
 Game::~Game() {
@@ -44,6 +47,7 @@ void Game::setInput(Controls control) {
             break;
         case Attack:
             input = Attack;
+            stats->L_Damage(10);
             break;
         case Attack2:
             input = Attack2;
@@ -58,17 +62,20 @@ void Game::setInput(Controls control) {
 }
 void Game::updatePlayer(bool runLeft, bool runRight) {
     player->setHitbox();
+    bot->animate("Attack", R_clock);
+    bot->setCompleted();
+    
     switch (input) {
         case Left:
             player->getSprite().move(-1, 0);
-            player->animate("Run", clock);
+            player->animate("Run", L_clock);
             if (player->getCompleted() == true && !runLeft) {
                 input = Idle;
             }
             break;
         case Right:
             player->getSprite().move(1, 0);
-            player->animate("Run", clock);
+            player->animate("Run", L_clock);
             if (player->getCompleted() == true && !runRight) {
                 input = Idle;
             }
@@ -79,7 +86,7 @@ void Game::updatePlayer(bool runLeft, bool runRight) {
             } else if(runLeft) {
                 player->getSprite().move(-.25, 0); 
             }
-            player->animate("Attack", clock);
+            player->animate("Attack", L_clock);
             if (player->getCompleted() == true) {
                 input = Idle;
             }
@@ -90,7 +97,7 @@ void Game::updatePlayer(bool runLeft, bool runRight) {
             } else if(runLeft) {
                 player->getSprite().move(-.25, 0); 
             }
-            player->animate("Attack2", clock);
+            player->animate("Attack2", L_clock);
             if (player->getCompleted() == true) {
                 input = Idle;
             }
@@ -100,8 +107,9 @@ void Game::updatePlayer(bool runLeft, bool runRight) {
             input = storedInput;
             break;
             }
-            player->animate("Idle", clock);
+            player->animate("Idle", L_clock);
             player->setCompleted();
+
             break;
         case Jump:
             player->setJump(runLeft || runRight);
@@ -114,5 +122,8 @@ void Game::updatePlayer(bool runLeft, bool runRight) {
 
 void Game::draw(sf::RenderTarget& window, sf::RenderStates states) const {
     window.draw(background, states);
+    window.draw(*bot,states);
     window.draw(*player,states);
+    window.draw(*stats,states);
+
 }

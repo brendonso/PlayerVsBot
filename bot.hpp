@@ -5,10 +5,10 @@
 #include <unordered_map>
 #include <vector>
 #include "game.hpp"
-class Player : public sf::Drawable{
+class Bot : public sf::Drawable{
 public:
-    Player();
-    Player(float x); 
+    Bot();
+    Bot(float x); 
     void loadFiles();
     void run();
     void idle();
@@ -54,11 +54,11 @@ private:
     bool jumping = false;
 
     bool gravity = false;
-    sf::Texture L_Attack; 
-    sf::Texture L_Attack2; 
-    sf::Texture L_Dead;
-    sf::Texture L_Idle;
-    sf::Texture L_Run;
+    sf::Texture R_Attack; 
+    sf::Texture R_Attack2; 
+    sf::Texture R_Dead;
+    sf::Texture R_Idle;
+    sf::Texture R_Run;
     sf::Vector2f origin;
 
     int health;
@@ -70,11 +70,11 @@ private:
     };
 
     std::map<std::string, data> animations = {
-        {"Attack", {10.0f, &L_Attack}},
-        {"Attack2", {6.0f, &L_Attack2}},
-        {"Damage", {2.0f, &L_Dead}},
-        {"Dead", {12.0f, &L_Dead}},
-        {"Idle", {4.0f, &L_Idle}},
-        {"Run", {6.0f, &L_Run}},
+        {"Attack", {7.0f, &R_Attack}},
+        {"Attack2", {7.0f, &R_Attack2}},
+        {"Damage", {8.0f, &R_Dead}},
+        {"Dead", {8.0f, &R_Dead}},
+        {"Idle", {5.0f, &R_Idle}},
+        {"Run", {6.0f, &R_Run}},
     };
 };

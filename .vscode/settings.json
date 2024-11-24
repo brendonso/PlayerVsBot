@@ -47,7 +47,14 @@
         "stdexcept": "cpp",
         "streambuf": "cpp",
         "cinttypes": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "cstring": "cpp",
+        "cfenv": "cpp",
+        "charconv": "cpp",
+        "source_location": "cpp",
+        "iomanip": "cpp",
+        "sstream": "cpp",
+        "stdfloat": "cpp"
     },
     "C_Cpp.errorSquiggles": "disabled"
 }
