@@ -7,9 +7,19 @@ Stats::Stats() {
 
 }
 
-void Stats::L_Damage(int damage) {
-    L_health -= damage;
-    L_healthBar.setSize(sf::Vector2f(L_health, 20));
+
+void Stats::updateData(int player, int bot) {
+    updateLHealth(player);
+    updateRHealth(bot);
+    updateClock();
+}
+
+void Stats::updateLHealth(int health) {
+    L_healthBar.setSize(sf::Vector2f(health, 20));
+}
+
+void Stats::updateRHealth(int health) {
+    R_healthBar.setSize(sf::Vector2f(health, 20));
 }
 
 void Stats::draw(sf::RenderTarget& window, sf::RenderStates states) const {
@@ -19,14 +29,16 @@ void Stats::draw(sf::RenderTarget& window, sf::RenderStates states) const {
     window.draw(R_healthBar, states);
     window.draw(text);
 }
-void Stats::updateClock() {
+bool Stats::updateClock() {
     if(matchTime != 0) {
     matchTime = 1 - static_cast <int> (clock.getElapsedTime().asSeconds());
     text.setString(std::to_string(matchTime));
     } else {
         text.setPosition(325,15);
         text.setString("GAME OVER");
+        return false;
     }
+    return true;
 }
 void Stats::setupClock() {
     if (!font.loadFromFile("resources/Tiny5.ttf")) {

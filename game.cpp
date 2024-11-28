@@ -2,24 +2,38 @@
 
 Game::Game() {
     loadFiles();
-    player = new Bot();
-    bot = new Player(50);
+    bool selectPlayer = true;
+    bot = new Player(selectPlayer);  
+    player = new Player(!selectPlayer);  
+    stats = new Stats();
+}
+Game::Game(sf::Texture selectMap, bool selectPlayer) {
+    background.setTexture(selectMap);
+    isPlayer = selectPlayer;
+    player = new Player(selectPlayer);  
+    bot = new Player(!selectPlayer);  
     stats = new Stats();
 }
 
 void Game::update() {
-    timer = L_clock.getElapsedTime().asSeconds();
-    runLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
-    runRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
-    updatePlayer(runLeft,runRight);
-    stats->updateClock();
-
-
+    getMovement();
+    player->updatePlayer(runLeft, runRight, L_clock, botHitbox);
+    getBotMovement();
+    bot->updatePlayer(bot_runLeft,bot_runRight, R_clock, playerHitbox);
+    stats->updateData(player->getHealth(),bot->getHealth());
 }
 
 
-float Game::getTime() {
-    return L_clock.getElapsedTime().asSeconds();
+
+void Game::updateCollisions() {
+    playerHitbox = player->getHitbox().getGlobalBounds();
+    playerAttackBox = player->getAttackbox().getGlobalBounds();
+    playerAttackBox2 = player->getAttackbox2().getGlobalBounds();
+    botHitbox = bot->getHitbox().getGlobalBounds();
+    botAttackBox = bot->getAttackbox().getGlobalBounds();
+    botAttackBox2 = bot->getAttackbox2().getGlobalBounds();
+    botInBounds = bot->getHitbox().getPosition().x < 870 && bot->getHitbox().getPosition().x > 30;
+
 }
 
 Game::~Game() {
@@ -33,90 +47,112 @@ void Game::loadFiles() {
     background.setTexture(map);
 }
 
-void Game::setInput(Controls control) {
-    switch (control) {
-        case Left:
-            input = Left;
-            storedInput = Left;
-            player->setFlipped(true);
-            break;
-        case Right:
-            input = Right;
-            storedInput = Right;
-            player->setFlipped(false);
-            break;
-        case Attack:
-            input = Attack;
-            stats->L_Damage(10);
-            break;
-        case Attack2:
-            input = Attack2;
-            break;
-        case Jump:
-            input = Jump;
-            break;
-        default:
-            input = Idle;
-            break;
+void Game::getBotMovement() {
+    updateCollisions();
+    if(bot->getCompleted() == true || bot->getInput() == Idle) {
+        if(modeClock.getElapsedTime().asSeconds() > 5) {
+        mode = rand() % 4;
+        modeClock.restart();
+        }
+        
+        if (mode == 1 && playerAttackBox2.intersects(botHitbox)) {
+            setNinjaMode();
+        } else if(mode == 2 && playerAttackBox.intersects(botHitbox)){
+            setAttackMode();
+        } else {
+            setNormalMode();
+        }
+        if (botAttackBox.intersects(playerHitbox)) {
+            bot->setInput(Attack);
+            player->isAttacked(1);
+        }
+        checkBounds();
     }
 }
-void Game::updatePlayer(bool runLeft, bool runRight) {
-    player->setHitbox();
-    bot->animate("Attack", R_clock);
-    bot->setCompleted();
-    
-    switch (input) {
-        case Left:
-            player->getSprite().move(-1, 0);
-            player->animate("Run", L_clock);
-            if (player->getCompleted() == true && !runLeft) {
-                input = Idle;
-            }
-            break;
-        case Right:
-            player->getSprite().move(1, 0);
-            player->animate("Run", L_clock);
-            if (player->getCompleted() == true && !runRight) {
-                input = Idle;
-            }
-            break;
-        case Attack:
-            if(runRight) {
-               player->getSprite().move(.25, 0); 
-            } else if(runLeft) {
-                player->getSprite().move(-.25, 0); 
-            }
-            player->animate("Attack", L_clock);
-            if (player->getCompleted() == true) {
-                input = Idle;
-            }
-            break;
-        case Attack2:
-            if(runRight) {
-               player->getSprite().move(.25, 0); 
-            } else if(runLeft) {
-                player->getSprite().move(-.25, 0); 
-            }
-            player->animate("Attack2", L_clock);
-            if (player->getCompleted() == true) {
-                input = Idle;
-            }
-            break;
-        case Idle:
-            if(runLeft || runRight) {
-            input = storedInput;
-            break;
-            }
-            player->animate("Idle", L_clock);
-            player->setCompleted();
 
-            break;
-        case Jump:
+
+void Game::setNormalMode() {
+    if (playerHitbox.left < botHitbox.left) {
+        bot->setInput(Left);
+    } else if (playerHitbox.left > botHitbox.left) {
+        bot->setInput(Right);
+    }
+}
+void Game::setNinjaMode() {
+    if (playerAttackBox.intersects(botHitbox)) {
+        if (playerHitbox.left < botHitbox.left && bot->inBounds(-1)) {
+            bot->setInput(Left);
+            bot->setJump(true);
+        } else if (bot->inBounds(1)) {
+            bot->setInput(Right);
+            bot->setJump(true);
+        }
+    } else {
+        if (playerHitbox.left < botHitbox.left && bot->inBounds(1)) {
+            bot->setInput(Right);
+        } else if (bot->inBounds(-1)) {
+            bot->setInput(Left);
+        }
+    }
+}
+void Game::setAttackMode() {
+    if (playerAttackBox.intersects(botHitbox)) {
+        if (playerHitbox.left < botHitbox.left && bot->inBounds(-1)) {
+            bot->setInput(Left);
+            bot->setJump(true);
+        } else if (bot->inBounds(1)) {
+            bot->setInput(Right);
+            bot->setJump(true);
+        }
+    } else {
+        if (playerHitbox.left < botHitbox.left && bot->inBounds(1)) {
+            bot->setInput(Right);
+        } else if (bot->inBounds(-1)) {
+            bot->setInput(Left);
+        }
+    }
+}
+void Game::checkBounds() {
+    if (botHitbox.intersects(playerHitbox) || !botInBounds) {
+        if(!botInBounds) {
+            if (playerHitbox.left < botHitbox.left) {
+                bot->getSprite().move(-2, 0);
+            } else if (playerHitbox.left > botHitbox.left) {
+                bot->getSprite().move(2, 0);
+            }
+        } else {
+            if (playerHitbox.left < botHitbox.left) {
+                bot->getSprite().move(2, 0);
+            } else {
+                bot->getSprite().move(-2, 0);
+            }
+        }
+    }
+}
+
+void Game::getMovement() {
+    runLeft = sf::Keyboard::isKeyPressed(sf::Keyboard::Left);
+    runRight = sf::Keyboard::isKeyPressed(sf::Keyboard::Right);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space)) {
             player->setJump(runLeft || runRight);
-            input = storedInput;
-            break;
-        default:
-            break;
+    }
+}
+
+void Game::setInput(Controls control) {
+    if (control == Attack || control == Attack2) {
+        player->setInput(control);
+        attackBot(control);
+    } else {
+        player->setInput(control);
+    }
+}
+void Game::attackBot(Controls type) {
+    if (type == Attack && playerAttackBox.intersects(botHitbox)) {
+        bot->isAttacked(10);
+    } else if (type == Attack2 && playerAttackBox2.intersects(botHitbox)) {
+        bot->setFlipped(true);
+        bot->setJump(true);
+        bot->isAttacked(10);
     }
 }
 
@@ -125,5 +161,4 @@ void Game::draw(sf::RenderTarget& window, sf::RenderStates states) const {
     window.draw(*bot,states);
     window.draw(*player,states);
     window.draw(*stats,states);
-
 }
