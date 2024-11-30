@@ -4,12 +4,15 @@
 Hello! In this game, Players can select their fighter & choose their own background then fight opponent that is a bot programmed with multiple behaviors/strategies. 
 
 **Fighting with the Bot**
+  
 ![SS1](resources/ss1.gif)
-
-**After the match, menu**
+  
+**After the match, the menu lets players select their map and fighter**
+  
 ![ss2](resources/ss2.gif)
 
 **New Map & Fighter selected**
+
 ![ss3](resources/ss3.gif)
 
 # Features
