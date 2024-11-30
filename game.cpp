@@ -50,13 +50,16 @@ void Game::getBotMovement() {
     if((!player->isDying() && !bot->isDying())) {
         updateCollisions();
         if(bot->getCompleted() == true || bot->getInput() == Idle) {
-            if(modeClock.getElapsedTime().asSeconds() > 5) {
-            mode = rand() % 5;
+            if(modeClock.getElapsedTime().asSeconds() > 2) {
+            int seed = modeClock.getElapsedTime().asMilliseconds();
+            std::srand(static_cast<unsigned int>(seed * 1000));
+            mode = rand() % 6;
+            //std::cout << mode;
             modeClock.restart();
             }
-            if (mode == 1 && playerAttackBox2.intersects(botHitbox)) {
+            if (((mode == 1) || (mode == 2 && (bot->getHealth() < 100))|| (mode == 4 && (bot->getHealth() <100))) && playerAttackBox2.intersects(botHitbox)) {
                 setNinjaMode();
-            } else if((mode == 2 || mode == 3) && playerAttackBox.intersects(botHitbox)){
+            } else if((mode == 2 || mode == 3 || (mode == 5 && (bot->getHealth() < 200))) && playerAttackBox.intersects(botHitbox)){
                 setAttackMode();
             } else {
                 setNormalMode();

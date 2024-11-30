@@ -25,6 +25,9 @@ void Stats::draw(sf::RenderTarget& window, sf::RenderStates states) const {
 
 void Stats::updateStats(bool isDying) {
     matchTime = maxTime - static_cast<int>(clock.getElapsedTime().asSeconds());
+    if(matchTime == 0) {
+        isDying = true;
+    }
     if (matchTime > 0 && L_health > 0 && R_health > 0) {
         text.setString(std::to_string(matchTime));
     }else if ((matchTime == 0  || L_health <= 0 || R_health <= 0) && !matchOver && isDying) {
