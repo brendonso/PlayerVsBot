@@ -1,7 +1,7 @@
 # PVP with Bot - Brendon So
 
 # Intro
-Hello! In this game, Players can select their fighter & choose their own background then fight opponent that is a bot programmed with multiple behaviors/strategies. 
+Hello! In this game, Players can select their fighter & choose a background before fighting against a bot opponent that is programmed with multiple behaviors and strategies. 
 
 **Fighting with the Bot**
   
