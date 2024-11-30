@@ -2,9 +2,9 @@ CC = g++
 CFLAGS = --std=c++17 -Wall
 LIB = -lsfml-graphics -lsfml-audio -lsfml-window -lsfml-system
 
-DEPS = game.hpp player.hpp stats.hpp 
+DEPS = game.hpp player.hpp stats.hpp menu.hpp
 
-OBJECTS = main.o game.o player.o stats.cpp 
+OBJECTS = main.o game.o player.o stats.cpp menu.cpp
 
 PROGRAM = Fight
 
